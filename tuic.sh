@@ -109,6 +109,7 @@ pmtu = true
 send_window = 33554432
 receive_window = 16777216
 max_idle_time = "25s"
+max-open-streams = 512
 
 [quic.congestion_control]
 controller = "bbr"
@@ -162,4 +163,5 @@ main() {
 }
 
 main "$@"
+
 
