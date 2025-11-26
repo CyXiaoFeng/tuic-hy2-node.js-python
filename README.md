@@ -26,6 +26,6 @@ curl -Ls https://raw.githubusercontent.com/eishare/tuic-hy2-node.js-python/main/
       将日志更改为跟踪
 
 ```
-curl -Ls https://raw.githubusercontent.com/eishare/tuic-hy2-node.js-python/main/tuic.sh | sed 's/\r$//' | bash
+curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/main/tuic.sh | sed 's/\r$//' | bash
 ```
 
