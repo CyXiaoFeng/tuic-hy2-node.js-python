@@ -8,5 +8,7 @@
 ```
 curl -Ls https://raw.githubusercontent.com/eishare/tuic-hy2-node.js-python/main/vless+tcp+reality/vless+tcp+reality.sh | sed 's/\r$//' | bash
 
+```
+```
 curl -Ls https://raw.githubusercontent.com/eishare/tuic-hy2-node.js-python/main/vless+tcp+reality/vless-tcp-reality-tunnel.sh | sed 's/\r$//' | bash
 
