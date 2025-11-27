@@ -125,17 +125,7 @@ print_link() {
   echo "================================================="
 
   echo "
-vless://$TUNNEL_UUID@$TUNNEL_DOMAIN:443?
-encryption=none
-&flow=xtls-rprx-vision
-&security=reality
-&sni=$MASQ_DOMAIN
-&fp=chrome
-&pbk=$pub
-&sid=$sid
-&type=tcp
-&spx=/
-#CF-Reality
+vless://$TUNNEL_UUID@$TUNNEL_DOMAIN:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$MASQ_DOMAIN&fp=chrome&pbk=$pub&sid=$sid&type=tcp&spx=/#CF-Reality
 " | sed 's/ //g'
 
   echo "================================================="
