@@ -102,7 +102,7 @@ gen_vless_config() {
     },
     "streamSettings": {
       "network": "tcp",  // 使用 TCP 协议
-      "security": "reality",  // 使用 Reality 协议
+      "security": "reality",  // Reality 协议
       "realitySettings": {
         "show": false,
         "dest": "$MASQ_DOMAIN:443",  // 伪装目标域名
