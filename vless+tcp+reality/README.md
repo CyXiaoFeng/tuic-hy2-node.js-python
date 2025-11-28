@@ -1,7 +1,6 @@
 此部署方案仅供参考！
-在翼龙面板速度欠佳，晚高峰直接趴窝！
 
-# Vless+tcp+reality一键脚本极简部署
+# Vless+tcp+reality一键脚本+cf隧道极简部署
 
 * 更新自适应端口，无需再手动设置
 
@@ -13,7 +12,7 @@ curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/ma
 curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/main/vless+tcp+reality/vless-tcp-reality-tunnel.sh | sed 's/\r$//' | bash
 
 ```
-## 所有支持的环境变量：
+## CF隧道所有支持的环境变量说明：
 
 | 环境变量 | 说明 | 示例值 | 默认值 |
 |---------|------|--------|--------|
