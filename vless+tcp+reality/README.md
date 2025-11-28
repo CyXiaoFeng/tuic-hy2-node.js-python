@@ -12,3 +12,17 @@ curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/ma
 ```
 curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/main/vless+tcp+reality/vless-tcp-reality-tunnel.sh | sed 's/\r$//' | bash
 
+## 所有支持的环境变量：
+
+| 环境变量 | 说明 | 示例值 | 默认值 |
+|---------|------|--------|--------|
+| `REALITY_PORT` | Reality 直连端口 | `8443` | `3250` |
+| `TUNNEL_PORT` | CF Tunnel 本地监听端口 | `6868` | `6868` |
+| `TUNNEL_UUID` | CF Tunnel 客户端 UUID | `74a91aaf-...` | 自动生成 |
+| `TUNNEL_TOKEN` | CF Tunnel Token（**必需**） | `eyJhIjoiOTFm...` | - |
+| `TUNNEL_DOMAIN` | CF Tunnel 域名（**必需**） | `wbtunnel.example.com` | - |
+
+## 端口说明：
+
+- **REALITY_PORT**：外部访问的 Reality 端口（直连用）
+- **TUNNEL_PORT**：Xray 本地监听端口（给 cloudflared 转发用，不对外暴露）
