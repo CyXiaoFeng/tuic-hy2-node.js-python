@@ -6,23 +6,124 @@
 # =========================================
 set -uo pipefail
 
-# ========== Cloudflare Tunnel 配置 ==========
-TUNNEL_PORT=6868
-TUNNEL_UUID="74a91aaf-b506-40e8-9949-361480d38037"
-TUNNEL_TOKEN="eyJhIjoiOTFmMzMxNTllZTgwMTI4ZDY1MGZlNTZkMTc3MWVhNzciLCJ0IjoiZjA1YmNhODQtNTM2Ni00ZmViLWI1NzYtZTc1NzEyMTg0ODZmIiwicyI6Ik4ySmxNR1UyWWpBdE1XWmhNUzAwWVdabExUbGxNemt0TUdKaU16UmhaamRrWldFeiJ9"
-TUNNEL_DOMAIN="wbtunnel.wai2mini.dpdns.org"
+# ========== 参数解析（支持环境变量和命令行参数）==========
+usage() {
+  cat <<EOF
+Usage: $0 [OPTIONS]
 
-# ========== 自动检测端口（翼龙环境变量优先）==========
-if [[ -n "${SERVER_PORT:-}" ]]; then
-  PORT="$SERVER_PORT"
-  echo "Port (env): $PORT"
-elif [[ $# -ge 1 && -n "$1" ]]; then
-  PORT="$1"
-  echo "Port (arg): $PORT"
-else
-  PORT=3250
-  echo "Port (default): $PORT"
+OPTIONS:
+  -p, --port PORT              Reality 端口 (默认: 3250 或 \$SERVER_PORT)
+  -t, --tunnel-port PORT       CF Tunnel 本地端口 (默认: 6868)
+  -k, --tunnel-token TOKEN     CF Tunnel Token (必需)
+  -d, --tunnel-domain DOMAIN   CF Tunnel 域名 (必需)
+  -u, --tunnel-uuid UUID       CF Tunnel UUID (可选，默认随机生成)
+  -h, --help                   显示帮助信息
+
+ENVIRONMENT VARIABLES (优先级高于命令行参数):
+  REALITY_PORT                 Reality 端口
+  TUNNEL_PORT                  CF Tunnel 本地端口
+  TUNNEL_TOKEN                 CF Tunnel Token (必需)
+  TUNNEL_DOMAIN                CF Tunnel 域名 (必需)
+  TUNNEL_UUID                  CF Tunnel UUID
+
+EXAMPLE (命令行):
+  $0 --tunnel-token "eyJh..." --tunnel-domain "wbtunnel.example.com"
+
+EXAMPLE (环境变量):
+  TUNNEL_TOKEN="eyJh..." TUNNEL_DOMAIN="tunnel.com" bash <(curl -Ls https://...)
+
+EXAMPLE (curl 单行命令 - 完整参数):
+  curl -Ls https://raw.githubusercontent.com/.../script.sh | \\
+    REALITY_PORT=8443 \\
+    TUNNEL_PORT=6868 \\
+    TUNNEL_UUID="74a91aaf-b506-40e8-9949-361480d38037" \\
+    TUNNEL_TOKEN="eyJh..." \\
+    TUNNEL_DOMAIN="wbtunnel.example.com" \\
+    bash
+
+EXAMPLE (curl 单行命令 - 最简参数):
+  curl -Ls https://raw.githubusercontent.com/.../script.sh | \\
+    TUNNEL_TOKEN="eyJh..." \\
+    TUNNEL_DOMAIN="wbtunnel.example.com" \\
+    bash
+EOF
+  exit 0
+}
+
+# 从环境变量读取默认值（优先级最高）
+PORT="${REALITY_PORT:-}"
+TUNNEL_PORT="${TUNNEL_PORT:-6868}"
+TUNNEL_UUID="${TUNNEL_UUID:-}"
+TUNNEL_TOKEN="${TUNNEL_TOKEN:-}"
+TUNNEL_DOMAIN="${TUNNEL_DOMAIN:-}"
+
+# 解析命令行参数（覆盖环境变量）
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -p|--port)
+      PORT="$2"
+      shift 2
+      ;;
+    -t|--tunnel-port)
+      TUNNEL_PORT="$2"
+      shift 2
+      ;;
+    -k|--tunnel-token)
+      TUNNEL_TOKEN="$2"
+      shift 2
+      ;;
+    -d|--tunnel-domain)
+      TUNNEL_DOMAIN="$2"
+      shift 2
+      ;;
+    -u|--tunnel-uuid)
+      TUNNEL_UUID="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      ;;
+    *)
+      echo "Unknown option: $1"
+      usage
+      ;;
+  esac
+done
+
+# 验证必需参数
+if [[ -z "$TUNNEL_TOKEN" ]]; then
+  echo "ERROR: TUNNEL_TOKEN is required (use environment variable or --tunnel-token)"
+  echo ""
+  usage
 fi
+
+if [[ -z "$TUNNEL_DOMAIN" ]]; then
+  echo "ERROR: TUNNEL_DOMAIN is required (use environment variable or --tunnel-domain)"
+  echo ""
+  usage
+fi
+
+# ========== 自动检测 Reality 端口 ==========
+if [[ -z "$PORT" ]]; then
+  if [[ -n "${SERVER_PORT:-}" ]]; then
+    PORT="$SERVER_PORT"
+    echo "Reality Port (env SERVER_PORT): $PORT"
+  else
+    PORT=3250
+    echo "Reality Port (default): $PORT"
+  fi
+else
+  echo "Reality Port: $PORT"
+fi
+
+# 生成 Tunnel UUID（如果未提供）
+if [[ -z "$TUNNEL_UUID" ]]; then
+  TUNNEL_UUID=$(cat /proc/sys/kernel/random/uuid 2>/dev/null || openssl rand -hex 16)
+  echo "Generated Tunnel UUID: $TUNNEL_UUID"
+fi
+
+echo "CF Tunnel Port: $TUNNEL_PORT"
+echo "CF Tunnel Domain: $TUNNEL_DOMAIN"
 
 # ========== 文件定义 ==========
 MASQ_DOMAIN="www.bing.com"
@@ -178,7 +279,13 @@ run_vless() {
 
 # ========== 主函数 ==========
 main() {
-  echo "Deploying VLESS + TCP + Reality + Cloudflare Tunnel"
+  echo "========================================="
+  echo "Deploying VLESS + Reality + CF Tunnel"
+  echo "Reality Port: $PORT"
+  echo "CF Tunnel Port: $TUNNEL_PORT"
+  echo "CF Tunnel Domain: $TUNNEL_DOMAIN"
+  echo "========================================="
+  
   load_config
   [[ -z "${VLESS_UUID:-}" ]] && VLESS_UUID=$(cat /proc/sys/kernel/random/uuid 2>/dev/null || openssl rand -hex 16)
   
@@ -196,4 +303,4 @@ main() {
   run_vless
 }
 
-main "$@"
+main
