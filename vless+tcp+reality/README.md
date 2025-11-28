@@ -12,6 +12,7 @@ curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/ma
 ```
 curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/main/vless+tcp+reality/vless-tcp-reality-tunnel.sh | sed 's/\r$//' | bash
 
+```
 ## 所有支持的环境变量：
 
 | 环境变量 | 说明 | 示例值 | 默认值 |
@@ -26,3 +27,7 @@ curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/ma
 
 - **REALITY_PORT**：外部访问的 Reality 端口（直连用）
 - **TUNNEL_PORT**：Xray 本地监听端口（给 cloudflared 转发用，不对外暴露）
+```
+curl -Ls https://raw.githubusercontent.com/cyxiaofeng/tuic-hy2-node.js-python/main/vless+tcp+reality/vless-tcp-reality-tunnel.sh | sed 's/\r$//' | TUNNEL_TOKEN="真实TOKEN" TUNNEL_DOMAIN="真实隧道的域名" bash
+
+```
